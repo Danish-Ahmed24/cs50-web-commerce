@@ -1,0 +1,25 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h1>Add New Listing</h1>
+    <form action="" method="POST">
+        {% csrf_token %}
+        <!-- title,desc,bid,url,category -->
+         <label for="title">Enter Title</label><br>
+         <input type="text" name="title" id="title" required><br>
+         <label for="desc">Enter description</label><br>
+         <textarea name="desc" id="desc" cols="30" rows="10" required></textarea><br>
+         <label for="bid">Enter bid</label><br>
+         <input type="number" name="bid" id="bid" required><br>
+         <label for="url">Enter url</label><br>
+         <input type="url" name="url" id="url"><br>
+         <label for="category">select category</label><br>
+         <select name="category" id="category">
+            <option value="Fashion">Fashion</option>
+            <option value="Toys">Toys</option>
+            <option value="Electronics">Electronics</option>
+            <option value="Home">Home</option>
+         </select><br>
+         <input type="submit" value="Add">
+    </form>
+{% endblock %}

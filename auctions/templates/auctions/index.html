@@ -1,7 +1,27 @@
 {% extends "auctions/layout.html" %}
 
 {% block body %}
-    <h2>Active Listings</h2>
+<h2>Active Listings</h2>
+<div class="container" style="display: flex;
+flex-wrap: wrap;
+align-items: center;
+column-gap: 123px;
+row-gap: 15px;">
+{% for listing in listings %}
+    <div class="card" style="width: 18rem;">
+        <img src="{% if listing.url %}
+                {{listing.url}}
+        {% else %}
+            https://thumb.ac-illust.com/b1/b170870007dfa419295d949814474ab2_t.jpeg
+        {% endif %}" class="card-img-top" alt="IMAGE NOT FOUND">
+        <div class="card-body">
+            <h5 class="card-title">Title: {{listing.title}}</h5>
+            <h6 class="card-title">Price: {{listing.bid}}</h6>
+            <p class="card-text">{{listing.desc}}</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
 
-    TODO
 {% endblock %}
