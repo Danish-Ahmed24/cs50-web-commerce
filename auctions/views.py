@@ -1,3 +1,5 @@
+from django.contrib.auth.decorators import login_required
+
 from django.contrib.auth import authenticate, login, logout
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
@@ -8,13 +10,15 @@ from .models import *
 
 def index(request):
     allListings = Listing.objects.all()
-    activeListings = []
-    for listing in allListings:
-        if listing.is_active :
-            activeListings.append(listing)
+    listings_with_bids = []
 
-    return render(request, "auctions/index.html",{
-        "listings":activeListings
+    for listing in allListings:
+        if listing.is_active:
+            current_bid = listing.bids.last().amount if listing.bids.last() else "No bids yet"
+            listings_with_bids.append((listing, current_bid))
+
+    return render(request, "auctions/index.html", {
+        "listings_with_bids": listings_with_bids
     })
 
 
@@ -78,12 +82,17 @@ def createListing(request):
         url = request.POST.get('url')
         category = request.POST.get('category')
 
-        Listing.objects.create(
-        title=title,
-        desc=desc,
-        bid=bid,
-        url=url,
-        category=category
+        new_listing = Listing.objects.create(
+            title=title,
+            desc=desc,
+            url=url,
+            category=category
+        )
+
+        Bid.objects.create(
+            amount=bid,
+            bidmaker=request.user,
+            listing=new_listing
         )
         
 
@@ -91,4 +100,81 @@ def createListing(request):
 
 
     return render(request,"auctions/createListing.html")
+
+def listing(request, id):
+    reqListing = Listing.objects.get(pk=id)
+    isWishlisted = False
+    current_bid = reqListing.bids.last().amount
+    if request.user.is_authenticated:
+        try:
+            wishlist = WishList.objects.get(user=request.user)
+            isWishlisted = reqListing in wishlist.listings.all()
+        except WishList.DoesNotExist:
+            isWishlisted = False
+
+    return render(request, 'auctions/listing.html', {
+        "listing": reqListing,
+        "is_allowed_for_whishlist": request.user.is_authenticated,
+        "isWishlisted": isWishlisted,
+        "current_bid": current_bid
+    })
+
+
+@login_required
+def addWishlist(request):
+    if request.method == "POST":
+        listing_id = request.POST['listing_id']
+        try:
+            wishListOfUser = WishList.objects.get(user=request.user)
+        except WishList.DoesNotExist:
+            wishListOfUser = WishList(user=request.user)
+            wishListOfUser.save()
+        wishListOfUser.listings.add(Listing.objects.get(pk=listing_id))
+    return redirect("listing",id=listing_id)
+
+@login_required
+def delWishlist(request):
+    if request.method == "POST":
+        listing_id = request.POST['listing_id']
+        wishListOfUser = WishList.objects.get(user=request.user)
+        
+
+        wishListOfUser.listings.remove(Listing.objects.get(pk=listing_id))
+        
+
+        wishListOfUser.save()
+    return redirect("listing",id=listing_id)
+
+
+# listing_id , bid_amount
+def placeBid(request):
+    listing_id = request.POST['listing_id']
+    bid = float(request.POST.get('bid_amount'))
+    listing = Listing.objects.get(pk=listing_id)
+    allBids = listing.bids.all()
+    is_OK = False
+
+    for otherBid in allBids:
+        if bid >= otherBid.amount and len(allBids)==1 :
+            is_OK = True 
+            break
+        elif bid > otherBid.amount :
+            is_OK = True
+        else:
+            is_OK=False
+            break
+    
+    if is_OK:
+        Bid.objects.create(
+            amount = bid,
+            bidmaker= request.user,
+            listing = listing
+        )
+        return redirect('listing',id = listing_id)
+
+
+
+
+    return HttpResponse("Error")
+
 

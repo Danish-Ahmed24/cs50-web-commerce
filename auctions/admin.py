@@ -3,3 +3,5 @@ from .models import *
 # Register your models here.
 admin.site.register(Listing)
 admin.site.register(User)
+admin.site.register(WishList)
+admin.site.register(Bid)

@@ -7,21 +7,17 @@ flex-wrap: wrap;
 align-items: center;
 column-gap: 123px;
 row-gap: 15px;">
-{% for listing in listings %}
-    <div class="card" style="width: 18rem;">
-        <img src="{% if listing.url %}
-                {{listing.url}}
-        {% else %}
-            https://thumb.ac-illust.com/b1/b170870007dfa419295d949814474ab2_t.jpeg
-        {% endif %}" class="card-img-top" alt="IMAGE NOT FOUND">
-        <div class="card-body">
-            <h5 class="card-title">Title: {{listing.title}}</h5>
-            <h6 class="card-title">Price: {{listing.bid}}</h6>
-            <p class="card-text">{{listing.desc}}</p>
-            <a href="#" class="btn btn-primary">Go somewhere</a>
-        </div>
+{% for listing, current_bid in listings_with_bids %}
+<div class="card" style="width: 18rem;">
+    <img src="{% if listing.url %}{{ listing.url }}{% else %}https://thumb.ac-illust.com/b1/b170870007dfa419295d949814474ab2_t.jpeg{% endif %}" class="card-img-top" alt="IMAGE NOT FOUND">
+    <div class="card-body">
+        <h5 class="card-title">Title: {{ listing.title }}</h5>
+        <h6 class="card-title">Price: {{ current_bid }}</h6>
+        <p class="card-text">{{ listing.desc }}</p>
+        <a href="{% url 'listing' listing.pk %}" class="btn btn-primary">Details</a>
     </div>
-    {% endfor %}
+</div>
+{% endfor %}
     </div>
 
 {% endblock %}

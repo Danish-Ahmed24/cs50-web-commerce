@@ -1,0 +1,49 @@
+{% extends "auctions/layout.html" %}
+{% block body %}
+<div class="container">
+	<div class="row">
+		<div class="col-sm">
+			<img src="{{listing.url}}" class="img-fluid" alt="Responsive image" />
+		</div>
+		<div class="col-sm">
+			<h1>{{listing.title}}</h1>
+			<p>{{listing.desc}}</p>
+			<p>Category: {{listing.category}}</p>
+			<p>bid: {{ current_bid }}</p>   
+			{% comment %} yahan bitmaker chaiye {% endcomment %}
+			{% if is_allowed_for_whishlist %}
+			{% if not isWishlisted %}
+			<form method="POST" action="{% url "addWishlist" %}">
+				{% csrf_token %}
+				<input type="hidden" name="listing_id" value="{{ listing.id }}">
+				<button type="submit" class="btn btn-outline-danger">
+					Add to WishList
+				</button>
+			</form>
+            {% else %}
+			<form method="POST" action="{% url "delWishlist" %}">
+				{% csrf_token %}
+				<input type="hidden" name="listing_id" value="{{ listing.id }}">
+				<button type="submit" class="btn btn-outline-warning">Remove From WishList</button>
+			</form>
+            {% endif %}
+			{% endif %}
+            
+		</div>
+	</div>
+	<br>
+	<div class="row">
+		<div class="col-sm">
+			<form method="POST" action="{% url "placeBid" %}">
+				{% csrf_token %}
+				<input type="hidden" name="listing_id" value="{{ listing.id }}">
+				<label for="bid_amount">Enter Bid: </label>
+				<input type="number" name="bid_amount" id="bid_amount">
+				<button type="submit" class="btn btn-primary">
+					Bid
+				</button>
+			</form>
+		</div>
+	</div>
+</div>
+{% endblock body %}
