@@ -13,6 +13,7 @@ row-gap: 15px;">
     <div class="card-body">
         <h5 class="card-title">Title: {{ listing.title }}</h5>
         <h6 class="card-title">Price: {{ current_bid }}</h6>
+        <h6 class="card-title">{% if listing.is_active %}ACTIVE{% else %}CLOSED{% endif %} </h6>
         <p class="card-text">{{ listing.desc }}</p>
         <a href="{% url 'listing' listing.pk %}" class="btn btn-primary">Details</a>
     </div>

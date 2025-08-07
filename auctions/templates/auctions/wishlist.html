@@ -1,0 +1,11 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+<ul>
+    {% for list in wishlist %}
+        <a href="{% url "listing" list.pk %}"><li>{{ list.title }}</li>  </a>  
+    {% empty %}
+        empty
+    {% endfor %}
+</ul>
+{% endblock body %}

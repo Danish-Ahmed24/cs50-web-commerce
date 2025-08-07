@@ -1,3 +1,4 @@
+from decimal import Decimal
 from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth import authenticate, login, logout
@@ -13,7 +14,7 @@ def index(request):
     listings_with_bids = []
 
     for listing in allListings:
-        if listing.is_active:
+        # if listing.is_active:
             current_bid = listing.bids.last().amount if listing.bids.last() else "No bids yet"
             listings_with_bids.append((listing, current_bid))
 
@@ -74,6 +75,7 @@ def register(request):
         return render(request, "auctions/register.html")
 
 #Creating new Listing
+@login_required
 def createListing(request):
     if request.method == "POST":
         title = request.POST['title']
@@ -81,11 +83,13 @@ def createListing(request):
         bid = request.POST['bid']
         url = request.POST.get('url')
         category = request.POST.get('category')
+        owner = request.user
 
         new_listing = Listing.objects.create(
             title=title,
             desc=desc,
             url=url,
+            owner= owner,
             category=category
         )
 
@@ -104,6 +108,10 @@ def createListing(request):
 def listing(request, id):
     reqListing = Listing.objects.get(pk=id)
     isWishlisted = False
+    is_owner = False
+    is_winner = False
+
+
     current_bid = reqListing.bids.last().amount
     if request.user.is_authenticated:
         try:
@@ -112,11 +120,29 @@ def listing(request, id):
         except WishList.DoesNotExist:
             isWishlisted = False
 
+        if reqListing.owner == request.user:
+            is_owner=True
+
+    if not reqListing.is_active:
+        max = 0
+        win = None
+        for x in reqListing.bids.all():
+            if max<x.amount:
+                win = x
+                max = x.amount
+        if request.user == win.bidmaker:
+            is_winner= True
+    
+
+
     return render(request, 'auctions/listing.html', {
         "listing": reqListing,
-        "is_allowed_for_whishlist": request.user.is_authenticated,
+        "is_authenticated": request.user.is_authenticated,
         "isWishlisted": isWishlisted,
-        "current_bid": current_bid
+        "current_bid": current_bid,
+        "is_owner":is_owner,
+        "is_winner":is_winner,
+        "comments":reqListing.comments.all(),
     })
 
 
@@ -147,6 +173,7 @@ def delWishlist(request):
 
 
 # listing_id , bid_amount
+@login_required
 def placeBid(request):
     listing_id = request.POST['listing_id']
     bid = float(request.POST.get('bid_amount'))
@@ -168,7 +195,7 @@ def placeBid(request):
         Bid.objects.create(
             amount = bid,
             bidmaker= request.user,
-            listing = listing
+            listing = listing 
         )
         return redirect('listing',id = listing_id)
 
@@ -177,4 +204,63 @@ def placeBid(request):
 
     return HttpResponse("Error")
 
+@login_required
+def closeAuction(request):
+    listing_id = request.POST.get('listing_id')
+    if request.method == "POST":
+        listing = Listing.objects.get(pk=listing_id)
+        listing.is_active = False
 
+        highest_bid = listing.bids.order_by('-amount').first()
+
+        if highest_bid:
+            listing.winner = highest_bid.bidmaker
+        
+        listing.save()
+
+    return redirect('index')
+
+@login_required
+def addComment(request):
+    if request.method == "POST":
+        listing_id = request.POST.get('listing_id')
+        text_comment = request.POST.get('text_comment')
+        commenter = request.user
+
+        Comment.objects.create(
+            text=text_comment,
+            commenter=commenter,
+            listing=Listing.objects.get(pk = listing_id)
+        )
+        
+
+    
+    return redirect('listing',id = request.POST['listing_id'])
+
+@login_required
+def wishlist(request):
+
+    user = request.user
+    wishlist = WishList.objects.filter(user=user).first()
+
+    return render(request,'auctions/wishlist.html',{
+        "wishlist":wishlist.listings.all()
+    })
+
+def categories(request):
+    return render(request,"auctions/categories.html")
+
+def category(request,category):
+    clistings = Listing.objects.filter(category=category).all()
+
+    return render(request, "auctions/index.html", {
+    "listings_with_bids": [
+            
+            (
+                listing,
+                listing.bids.last().amount if listing.bids.last() else "No bids yet"
+            )
+                
+                for listing in clistings
+        ]
+})
