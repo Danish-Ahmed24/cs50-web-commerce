@@ -1,11 +1,314 @@
 {% extends "auctions/layout.html" %}
 
+
+{% load static %}
+
+{% block head %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+    .main-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 60px 0;
+        margin-bottom: 40px;
+        color: white;
+        text-align: center;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .main-header h2 {
+        font-weight: 700;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        margin: 0;
+    }
+
+    .main-header p {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-top: 10px;
+    }
+
+    .wishlist-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 25px;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .wishlist-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        transition: all 0.3s ease;
+        position: relative;
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .wishlist-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        text-decoration: none;
+        color: inherit;
+    }
+
+    .wishlist-card .card-image {
+        width: 100%;
+        height: 200px;
+        background-size: cover;
+        background-position: center;
+        position: relative;
+    }
+
+    .wishlist-card .card-content {
+        padding: 25px;
+    }
+
+    .wishlist-card .card-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 10px;
+        line-height: 1.4;
+    }
+
+    .wishlist-card .card-description {
+        color: #7f8c8d;
+        line-height: 1.4;
+        margin-bottom: 15px;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+
+    .wishlist-card .card-category {
+        display: inline-block;
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin-bottom: 10px;
+    }
+
+    .wishlist-card .card-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #ecf0f1;
+    }
+
+    .wishlist-card .view-btn {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 16px;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .wishlist-card .view-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    .status-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        z-index: 10;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        border: 2px solid white;
+    }
+
+    .status-active {
+        background: linear-gradient(135deg, #28a745, #20c997);
+        color: white;
+    }
+
+    .status-closed {
+        background: linear-gradient(135deg, #dc3545, #e74c3c);
+        color: white;
+    }
+
+    .heart-icon {
+        position: absolute;
+        top: 15px;
+        left: 15px;
+        z-index: 10;
+        background: rgba(220, 53, 69, 0.9);
+        color: white;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        border: 2px solid white;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 80px 20px;
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #bdc3c7;
+        margin-bottom: 20px;
+    }
+
+    .empty-state h4 {
+        color: #2c3e50;
+        margin-bottom: 15px;
+    }
+
+    .empty-state .btn-explore {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-block;
+        margin-top: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .empty-state .btn-explore:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .wishlist-grid {
+            grid-template-columns: 1fr;
+            padding: 0 15px;
+        }
+
+        .main-header {
+            padding: 40px 0;
+        }
+        
+        .main-header h2 {
+            font-size: 2rem;
+        }
+
+        .wishlist-card .card-content {
+            padding: 20px;
+        }
+
+        .status-badge {
+            top: 10px;
+            right: 10px;
+            font-size: 0.7rem;
+            padding: 5px 12px;
+        }
+
+        .heart-icon {
+            top: 10px;
+            left: 10px;
+            width: 35px;
+            height: 35px;
+        }
+    }
+
+    @media (max-width: 400px) {
+        .wishlist-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block body %}
-<ul>
-    {% for list in wishlist %}
-        <a href="{% url "listing" list.pk %}"><li>{{ list.title }}</li>  </a>  
-    {% empty %}
-        empty
-    {% endfor %}
-</ul>
-{% endblock body %}
+<div class="main-header">
+    <div class="container">
+        <h2 class="display-4">
+            <i class="fas fa-heart me-3"></i>
+            My Wishlist
+        </h2>
+        <p>Your favorite auctions all in one place</p>
+    </div>
+</div>
+
+<div class="container">
+    {% if wishlist %}
+    <div class="wishlist-grid">
+        {% for listing in wishlist %}
+        <a href="{% url 'listing' listing.pk %}" class="wishlist-card">
+            <!-- Heart icon to show it's in wishlist -->
+            <div class="heart-icon">
+                <i class="fas fa-heart"></i>
+            </div>
+            
+            <!-- Status badge -->
+            <span class="status-badge {% if listing.is_active %}status-active{% else %}status-closed{% endif %}">
+                {% if listing.is_active %}ACTIVE{% else %}CLOSED{% endif %}
+            </span>
+            
+            <div class="card-image" style="background-image: url('{% firstof listing.url "https://via.placeholder.com/300x200?text=No+Image" %}')">
+            </div>
+            
+            <div class="card-content">
+                {% if listing.category %}
+                <span class="card-category">
+                    <i class="fas fa-tag me-1"></i>{{ listing.category }}
+                </span>
+                {% endif %}
+                
+                <h5 class="card-title">{{ listing.title }}</h5>
+                
+                {% if listing.desc %}
+                <p class="card-description">{{ listing.desc|truncatechars:120 }}</p>
+                {% endif %}
+                
+                <div class="card-footer">
+                    <span class="text-muted">
+                        <i class="fas fa-user me-1"></i>{{ listing.owner.username }}
+                    </span>
+                    <span class="view-btn">
+                        <i class="fas fa-eye me-1"></i> View Details
+                    </span>
+                </div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-heart-broken"></i>
+        <h4>Your Wishlist is Empty</h4>
+        <p class="text-muted">Start adding items to your wishlist by browsing our amazing auctions!</p>
+        <a href="{% url 'index' %}" class="btn-explore">
+            <i class="fas fa-search me-2"></i> Explore Auctions
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

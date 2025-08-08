@@ -1,10 +1,373 @@
-{% extends "auctions/layout.html" %}
+    {% extends "auctions/layout.html" %}
+    {% load static %}
 
-{% block body %}
-<ul>
-            <a href='category/Fashion'><li>Fashion</li></a>
-            <a href='category/Toys'><li>Toys</li></a>
-            <a href='category/Electronics'><li>Electronics</li></a>
-            <a href='category/Home'><li>Home</li></a>
-</ul>
-            {% endblock body %}
+    {% block head %}
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .main-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 60px 0;
+            margin-bottom: 40px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-header h2 {
+            font-weight: 700;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            margin: 0;
+        }
+
+        .main-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            height: 280px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .category-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .category-card .card-image {
+            height: 180px;
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .category-card .card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.8), rgba(118, 75, 162, 0.8));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover .card-overlay {
+            background: linear-gradient(135deg, rgba(102, 126, 234, 0.9), rgba(118, 75, 162, 0.9));
+        }
+
+        .category-card .card-icon {
+            font-size: 4rem;
+            color: white;
+            text-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .category-card:hover .card-icon {
+            transform: scale(1.1);
+        }
+
+        .category-card .card-content {
+            flex: 1;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            text-align: center;
+        }
+
+        .category-card .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 8px;
+        }
+
+        .category-card .card-description {
+            color: #7f8c8d;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .category-card .card-arrow {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            opacity: 0.8;
+        }
+
+        .category-card:hover .card-arrow {
+            transform: translateX(5px);
+            opacity: 1;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        /* Category-specific gradients and colors */
+        .category-fashion .card-overlay {
+            background: linear-gradient(135deg, rgba(250, 112, 154, 0.8), rgba(254, 225, 64, 0.8));
+        }
+
+        .category-fashion:hover .card-overlay {
+            background: linear-gradient(135deg, rgba(250, 112, 154, 0.9), rgba(254, 225, 64, 0.9));
+        }
+
+        .category-toys .card-overlay {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.8), rgba(0, 242, 254, 0.8));
+        }
+
+        .category-toys:hover .card-overlay {
+            background: linear-gradient(135deg, rgba(79, 172, 254, 0.9), rgba(0, 242, 254, 0.9));
+        }
+
+        .category-electronics .card-overlay {
+            background: linear-gradient(135deg, rgba(17, 153, 142, 0.8), rgba(56, 239, 125, 0.8));
+        }
+
+        .category-electronics:hover .card-overlay {
+            background: linear-gradient(135deg, rgba(17, 153, 142, 0.9), rgba(56, 239, 125, 0.9));
+        }
+
+        .category-home .card-overlay {
+            background: linear-gradient(135deg, rgba(255, 154, 158, 0.8), rgba(250, 208, 196, 0.8));
+        }
+
+        .category-home:hover .card-overlay {
+            background: linear-gradient(135deg, rgba(255, 154, 158, 0.9), rgba(250, 208, 196, 0.9));
+        }
+
+        .stats-section {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            margin: 40px auto;
+            max-width: 1200px;
+            text-align: center;
+        }
+
+        .stats-section h3 {
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 0.9rem;
+            letter-spacing: 0.5px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .categories-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                padding: 0 15px;
+                gap: 20px;
+            }
+
+            .category-card {
+                height: 260px;
+            }
+
+            .category-card .card-image {
+                height: 160px;
+            }
+
+            .category-card .card-icon {
+                font-size: 3rem;
+            }
+
+            .category-card .card-title {
+                font-size: 1.3rem;
+            }
+
+            .main-header {
+                padding: 40px 0;
+            }
+            
+            .main-header h2 {
+                font-size: 2rem;
+            }
+
+            .stats-section {
+                margin: 30px 15px;
+                padding: 30px 20px;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 20px;
+            }
+
+            .stat-number {
+                font-size: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .categories-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    {% endblock %}
+
+    {% block body %}
+    <div class="main-header">
+        <div class="container">
+            <h2 class="display-4">
+                <i class="fas fa-th-large me-3"></i>
+                Browse Categories
+            </h2>
+            <p>Discover amazing auctions organized by category</p>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="categories-grid">
+            <a href="category/Fashion" class="category-card category-fashion">
+                <div class="card-image">
+                    <div class="card-overlay">
+                        <i class="fas fa-tshirt card-icon"></i>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <h4 class="card-title">Fashion</h4>
+                    <p class="card-description">Designer clothes, accessories, and style essentials</p>
+                </div>
+                <div class="card-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <a href="category/Toys" class="category-card category-toys">
+                <div class="card-image">
+                    <div class="card-overlay">
+                        <i class="fas fa-gamepad card-icon"></i>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <h4 class="card-title">Toys</h4>
+                    <p class="card-description">Games, collectibles, and fun items for all ages</p>
+                </div>
+                <div class="card-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <a href="category/Electronics" class="category-card category-electronics">
+                <div class="card-image">
+                    <div class="card-overlay">
+                        <i class="fas fa-laptop card-icon"></i>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <h4 class="card-title">Electronics</h4>
+                    <p class="card-description">Latest gadgets, devices, and tech innovations</p>
+                </div>
+                <div class="card-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+
+            <a href="category/Home" class="category-card category-home">
+                <div class="card-image">
+                    <div class="card-overlay">
+                        <i class="fas fa-home card-icon"></i>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <h4 class="card-title">Home</h4>
+                    <p class="card-description">Furniture, decor, and household essentials</p>
+                </div>
+                <div class="card-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+            </a>
+        </div>
+
+        <div class="stats-section">
+            <h3>Auction Categories Overview</h3>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">150+</div>
+                    <div class="stat-label">Fashion Items</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">200+</div>
+                    <div class="stat-label">Electronics</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">120+</div>
+                    <div class="stat-label">Home & Garden</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">80+</div>
+                    <div class="stat-label">Toys & Games</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}

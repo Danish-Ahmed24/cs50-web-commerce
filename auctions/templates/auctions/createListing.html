@@ -1,25 +1,396 @@
 {% extends "auctions/layout.html" %}
+{% load static %}
+
+{% block head %}
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+    .create-listing-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+
+    .listing-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        transition: all 0.3s ease;
+    }
+
+    .listing-card:hover {
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .listing-header {
+        background: var(--primary-gradient);
+        color: white;
+        text-align: center;
+        padding: 40px 30px;
+    }
+
+    .listing-header i {
+        font-size: 3rem;
+        margin-bottom: 15px;
+        opacity: 0.9;
+    }
+
+    .listing-header h1 {
+        font-weight: 700;
+        margin: 0;
+        font-size: 2.2rem;
+    }
+
+    .listing-header p {
+        margin: 10px 0 0 0;
+        opacity: 0.9;
+        font-size: 1.1rem;
+    }
+
+    .listing-body {
+        padding: 40px 30px;
+    }
+
+    .form-section {
+        margin-bottom: 35px;
+    }
+
+    .section-title {
+        color: #2c3e50;
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        border-bottom: 2px solid #ecf0f1;
+        padding-bottom: 10px;
+    }
+
+    .section-title i {
+        margin-right: 10px;
+        color: #667eea;
+        font-size: 1.4rem;
+    }
+
+    .modern-form-group {
+        margin-bottom: 25px;
+        position: relative;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 8px;
+        color: #2c3e50;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .form-label i {
+        margin-right: 8px;
+        color: #667eea;
+        width: 16px;
+    }
+
+    .modern-input {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #ecf0f1;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+        font-family: inherit;
+    }
+
+    .modern-input:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .modern-textarea {
+        min-height: 120px;
+        resize: vertical;
+        font-family: inherit;
+    }
+
+    /* Remove any JS-dependent styles */
+    .category-option {
+        display: none; /* Hide radio button styling since we're using select */
+    }
+
+    .modern-select {
+        width: 100%;
+        padding: 15px 20px;
+        border: 2px solid #ecf0f1;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: #f8f9fa;
+        cursor: pointer;
+    }
+
+    .modern-select:focus {
+        outline: none;
+        border-color: #667eea;
+        background: white;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .input-hint {
+        font-size: 0.9rem;
+        color: #7f8c8d;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-hint i {
+        margin-right: 5px;
+        font-size: 0.8rem;
+    }
+
+    .price-input-group {
+        position: relative;
+    }
+
+    .price-symbol {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #27ae60;
+        font-weight: 700;
+        font-size: 1.2rem;
+        z-index: 2;
+    }
+
+    .price-input {
+        padding-left: 45px !important;
+    }
+
+    /* Remove category grid since we're using select dropdown */
+
+    .submit-section {
+        text-align: center;
+        padding-top: 20px;
+        border-top: 2px solid #ecf0f1;
+    }
+
+    .submit-btn {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        padding: 18px 40px;
+        border-radius: 12px;
+        font-size: 1.2rem;
+        font-weight: 700;
+        transition: all 0.3s ease;
+        min-width: 200px;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    }
+
+    .form-preview {
+        background: linear-gradient(135deg, rgba(102, 126, 234, 0.05), rgba(118, 75, 162, 0.05));
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 25px;
+        border-left: 4px solid #667eea;
+    }
+
+    .preview-title {
+        color: #2c3e50;
+        font-weight: 600;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+
+    .preview-title i {
+        margin-right: 8px;
+        color: #667eea;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .create-listing-container {
+            padding: 20px 15px;
+        }
+
+        .listing-header {
+            padding: 30px 25px;
+        }
+
+        .listing-header h1 {
+            font-size: 1.8rem;
+        }
+
+        .listing-body {
+            padding: 30px 25px;
+        }
+
+        .category-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 16px;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .listing-header {
+            padding: 25px 20px;
+        }
+
+        .listing-body {
+            padding: 25px 20px;
+        }
+
+        .section-title {
+            font-size: 1.1rem;
+        }
+    }
+</style>
+{% endblock %}
 
 {% block body %}
-    <h1>Add New Listing</h1>
-    <form action="" method="POST">
-        {% csrf_token %}
-        <!-- title,desc,bid,url,category -->
-         <label for="title">Enter Title</label><br>
-         <input type="text" name="title" id="title" required><br>
-         <label for="desc">Enter description</label><br>
-         <textarea name="desc" id="desc" cols="30" rows="10" required></textarea><br>
-         <label for="bid">Enter bid</label><br>
-         <input type="number" name="bid" id="bid" required><br>
-         <label for="url">Enter url</label><br>
-         <input type="url" name="url" id="url"><br>
-         <label for="category">select category</label><br>
-         <select name="category" id="category">
-            <option value="Fashion">Fashion</option>
-            <option value="Toys">Toys</option>
-            <option value="Electronics">Electronics</option>
-            <option value="Home">Home</option>
-         </select><br>
-         <input type="submit" value="Add">
-    </form>
+<div class="create-listing-container">
+    <div class="listing-card">
+        <div class="listing-header">
+            <i class="fas fa-plus-circle"></i>
+            <h1>Create New Listing</h1>
+            <p>Share your item with our premium auction community</p>
+        </div>
+        
+        <div class="listing-body">
+            <div class="form-preview">
+                <div class="preview-title">
+                    <i class="fas fa-lightbulb"></i>
+                    Pro Tip
+                </div>
+                <p style="margin: 0; color: #7f8c8d;">Add detailed information and high-quality images to attract more bidders and get better prices!</p>
+            </div>
+
+            <form action="" method="POST">
+                {% csrf_token %}
+                
+                <!-- Basic Information Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-info-circle"></i>
+                        Basic Information
+                    </h3>
+                    
+                    <div class="modern-form-group">
+                        <label class="form-label" for="title">
+                            <i class="fas fa-tag"></i>
+                            Listing Title
+                        </label>
+                        <input type="text" name="title" id="title" class="modern-input" placeholder="Enter a catchy title for your item" required>
+                        <div class="input-hint">
+                            <i class="fas fa-info"></i>
+                            Make it descriptive and engaging to attract more bidders
+                        </div>
+                    </div>
+                    
+                    <div class="modern-form-group">
+                        <label class="form-label" for="desc">
+                            <i class="fas fa-align-left"></i>
+                            Description
+                        </label>
+                        <textarea name="desc" id="desc" class="modern-input modern-textarea" placeholder="Describe your item in detail - condition, features, history, etc." required></textarea>
+                        <div class="input-hint">
+                            <i class="fas fa-info"></i>
+                            Include condition, dimensions, and any unique features
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pricing Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-dollar-sign"></i>
+                        Pricing
+                    </h3>
+                    
+                    <div class="modern-form-group">
+                        <label class="form-label" for="bid">
+                            <i class="fas fa-gavel"></i>
+                            Starting Bid Amount
+                        </label>
+                        <div class="price-input-group">
+                            <span class="price-symbol">$</span>
+                            <input type="number" name="bid" id="bid" class="modern-input price-input" placeholder="0.00" step="0.01" min="0" required>
+                        </div>
+                        <div class="input-hint">
+                            <i class="fas fa-info"></i>
+                            Set a competitive starting price to encourage bidding
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Media Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-image"></i>
+                        Media
+                    </h3>
+                    
+                    <div class="modern-form-group">
+                        <label class="form-label" for="url">
+                            <i class="fas fa-link"></i>
+                            Image URL
+                        </label>
+                        <input type="url" name="url" id="url" class="modern-input" placeholder="https://example.com/image.jpg">
+                        <div class="input-hint">
+                            <i class="fas fa-info"></i>
+                            Add a high-quality image to showcase your item (optional)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category Section -->
+                <div class="form-section">
+                    <h3 class="section-title">
+                        <i class="fas fa-th-large"></i>
+                        Category
+                    </h3>
+                    
+                    <div class="modern-form-group">
+                        <label class="form-label">
+                            <i class="fas fa-tags"></i>
+                            Select Category
+                        </label>
+                        <select name="category" id="category" class="modern-select" required>
+                            <option value="">Choose a category...</option>
+                            <option value="Fashion">👗 Fashion</option>
+                            <option value="Toys">🎮 Toys & Games</option>
+                            <option value="Electronics">💻 Electronics</option>
+                            <option value="Home">🏠 Home & Garden</option>
+                        </select>
+                        <div class="input-hint">
+                            <i class="fas fa-info"></i>
+                            Choose the most relevant category for better visibility
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Submit Section -->
+                <div class="submit-section">
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-rocket me-2"></i>
+                        Create Listing
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 {% endblock %}

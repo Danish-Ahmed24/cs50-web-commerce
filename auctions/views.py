@@ -239,28 +239,23 @@ def addComment(request):
 
 @login_required
 def wishlist(request):
-
     user = request.user
-    wishlist = WishList.objects.filter(user=user).first()
-
-    return render(request,'auctions/wishlist.html',{
-        "wishlist":wishlist.listings.all()
+    wishlist, created = WishList.objects.get_or_create(user=user)
+    return render(request, 'auctions/wishlist.html', {
+        "wishlist": wishlist.listings.all()
     })
 
 def categories(request):
-    return render(request,"auctions/categories.html")
+    return render(request, "auctions/categories.html")
 
-def category(request,category):
+def category(request, category):
     clistings = Listing.objects.filter(category=category).all()
-
     return render(request, "auctions/index.html", {
-    "listings_with_bids": [
-            
+        "listings_with_bids": [
             (
                 listing,
                 listing.bids.last().amount if listing.bids.last() else "No bids yet"
             )
-                
-                for listing in clistings
+            for listing in clistings
         ]
-})
+    })
