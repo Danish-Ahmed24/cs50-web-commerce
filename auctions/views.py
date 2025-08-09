@@ -110,7 +110,7 @@ def listing(request, id):
     isWishlisted = False
     is_owner = False
     is_winner = False
-
+    no_of_bids = len(reqListing.bids.all())
 
     current_bid = reqListing.bids.last().amount
     if request.user.is_authenticated:
@@ -143,6 +143,7 @@ def listing(request, id):
         "is_owner":is_owner,
         "is_winner":is_winner,
         "comments":reqListing.comments.all(),
+        "no_of_bids": no_of_bids
     })
 
 

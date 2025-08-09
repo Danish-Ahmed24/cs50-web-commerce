@@ -204,6 +204,25 @@
         word-wrap: break-word;
     }
 
+    /* New styling for bids count */
+    .bids-count {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 8px 12px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        margin-top: 10px;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .bids-count i {
+        margin-right: 6px;
+        font-size: 0.9rem;
+    }
+
     .action-buttons {
         display: flex;
         flex-direction: column;
@@ -382,16 +401,42 @@
     .comment-author {
         font-weight: 600;
         color: #2c3e50;
-        margin-bottom: 3px;
+        margin-bottom: 6px;
         display: flex;
         align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
         font-size: 0.85rem;
+        gap: 8px;
+    }
+
+    .comment-author-info {
+        display: flex;
+        align-items: center;
+        gap: 6px;
     }
 
     .comment-author i {
-        margin-right: 6px;
         color: #667eea;
         flex-shrink: 0;
+    }
+
+    /* New styling for comment date */
+    .comment-date {
+        background: rgba(102, 126, 234, 0.1);
+        color: #667eea;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.7rem;
+        font-weight: 500;
+        white-space: nowrap;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+
+    .comment-date i {
+        font-size: 0.7rem;
     }
 
     .comment-text {
@@ -513,6 +558,11 @@
             font-size: 1.7rem;
         }
 
+        .bids-count {
+            font-size: 0.9rem;
+            padding: 10px 16px;
+        }
+
         .bid-form {
             flex-direction: row;
             align-items: end;
@@ -540,6 +590,11 @@
 
         .section-header h3 {
             font-size: 1.3rem;
+        }
+
+        .comment-date {
+            font-size: 0.75rem;
+            padding: 3px 10px;
         }
     }
 
@@ -573,6 +628,11 @@
 
         .price-amount i {
             font-size: 2rem;
+        }
+
+        .bids-count {
+            font-size: 1rem;
+            padding: 12px 18px;
         }
 
         .bidding-section,
@@ -665,11 +725,19 @@
                             <i class="fas fa-dollar-sign"></i>
                             {% if listing.is_active %}
                                 {{ current_bid|floatformat:2 }}
+                                
                             {% else %}
                                 {{ current_bid|floatformat:2 }}
                                 <span>(Auction Closed)</span>
                             {% endif %}
+                            
                         </div>
+                    </div>
+
+                    <!-- Updated bids count styling -->
+                    <div class="bids-count">
+                        <i class="fas fa-gavel"></i>
+                        {{ no_of_bids }} {% if no_of_bids == 1 %}bid{% else %}bids{% endif %} currently
                     </div>
                 </div>
 
@@ -710,6 +778,7 @@
                     {% endif %}
                 </div>
                 {% endif %}
+
             </div>
         </div>
     </div>
@@ -769,8 +838,14 @@
                 {% for comment in comments %}
                 <div class="comment-item">
                     <div class="comment-author">
-                        <i class="fas fa-user-circle"></i>
-                        {{ comment.commenter.username }}
+                        <div class="comment-author-info">
+                            <i class="fas fa-user-circle"></i>
+                            {{ comment.commenter.username }}
+                        </div>
+                        <div class="comment-date">
+                            <i class="fas fa-clock"></i>
+                            {{ comment.date }}
+                        </div>
                     </div>
                     <p class="comment-text">{{ comment.text }}</p>
                 </div>
